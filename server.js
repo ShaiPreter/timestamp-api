@@ -9,9 +9,18 @@ function naturalize(date){
    return month + " " + day + ", " + year; 
 }
 
+app.get('/', function (req, res){
+res.send("Please enter a date or unix timestamp into the URL");
+});
+
 app.get('/:date', function (req, res) {
   var date = req.params.date;
+  
   if (date.match(/[a-z]/i)){
+    if (isNaN(Date.parse(date))) {
+    var json3 = {"Natural" : "null", "Unix" : "null"};
+    res.send(json3);
+  }
       var ISO = new Date(decodeURI(date)).toISOString();
       var natural = naturalize(ISO);
       var unix  = Date.parse(ISO);
@@ -19,14 +28,19 @@ app.get('/:date', function (req, res) {
       res.send(json);
   }
   else {
+    if (new Date(Number(date)).toISOString() == "Invalid Date"){
+        var json4 = {"Natural" : "null", "Unix" : "null"};
+    res.send(json4);
+      }
+    
       var unix2 = date;
       var ISO2 = new Date(Number(date)).toISOString();
+      
       var natural2  = naturalize(ISO2);
       var json2 = {"Natural" : natural2, "Unix" : unix2};
       res.send(json2);
   }
-  }
-  );
+  });
 
 app.listen(process.env.PORT || 8080, function () {
   console.log('Example app listening on port 8080');
